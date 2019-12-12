@@ -4,13 +4,13 @@
     <a href="LICENSE" target="_blank">
         <img alt="Software License" src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square">
     </a>
-    <a href="https://travis-ci.org/cakephp/cakephp" target="_blank">
+    <a href="https://travis-ci.org/flashios09/php-union-types" target="_blank">
         <img alt="Build Status" src="https://img.shields.io/travis/flashios09/php-union-types/master.svg?style=flat-square">
     </a>
     <a href='https://coveralls.io/github/flashios09/php-union-types?branch=master' target="_blank">
         <img src='https://coveralls.io/repos/github/flashios09/php-union-types/badge.svg?branch=master' alt='Coverage Status'>
     </a>
-    <a href="https://packagist.org/packages/cakephp/cakephp" target="_blank">
+    <a href="https://packagist.org/packages/flashios09/php-union-types" target="_blank">
         <img alt="Latest Stable Version" src="https://img.shields.io/packagist/v/flashios09/php-union-types.svg?style=flat-square&label=stable">
     </a>
 </p>
