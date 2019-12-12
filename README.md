@@ -175,7 +175,7 @@ Contributing
 
 ### Start a local php server with livereload
 * `yarn install`(node dependencies)
-* `yarn serve`(then add your code to `php-union-types/index.php` and open a browser window `localhost:3080`)
+* `yarn serve`(then add your code to `php-union-types/index.php` and open a browser window at `http://localhost:3080`)
 
 ### Start a local kahlan test with livereload
 * `yarn install`(node dependencies)
