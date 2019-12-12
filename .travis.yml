@@ -1,0 +1,31 @@
+dist: bionic
+language: php
+
+php:
+  - 7.1
+  - 7.2
+  - 7.3
+  - 7.4
+
+matrix:
+  fast_finish: true
+
+install:
+  - composer install --prefer-dist --no-interaction
+
+script:
+  - |
+      if [[ $TRAVIS_PHP_VERSION == '7.4' ]]; then
+        composer test-coverage
+      else
+        composer test
+      fi
+  - composer cs-check
+
+after_success:
+  - |
+      if [[ $TRAVIS_PHP_VERSION == '7.4' ]]; then
+        wget https://github.com/php-coveralls/php-coveralls/releases/download/v2.1.0/php-coveralls.phar
+        chmod +x php-coveralls.phar
+        ./php-coveralls.phar
+      fi

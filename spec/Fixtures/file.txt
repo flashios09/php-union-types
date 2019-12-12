@@ -1,0 +1,2 @@
+DO NOT REMOVE !!!
+Used only to test the resource type

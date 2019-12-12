@@ -1,0 +1,57 @@
+{
+    "name": "flashios09/php-union-types",
+    "description": "A php class for union types",
+    "type": "library",
+    "keywords": [
+        "type hinting",
+        "union types",
+        "mixed types"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Saif TURKI",
+            "email": "flashios09@gmail.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/flashios09/php-union-types/issues",
+        "source": "https://github.com/flashios09/php-union-types"
+    },
+    "require": {
+        "php": "^7.1"
+    },
+    "require-dev": {
+        "cakephp/cakephp-codesniffer": "dev-next",
+        "filp/whoops": "^2.5",
+        "kahlan/kahlan": "^4.6",
+        "symfony/var-dumper": "^4.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "UnionTypes\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "UnionTypes\\Spec\\": "spec/"
+        },
+        "files": [
+            "spec/functions.php"
+        ]
+    },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "phpcs --colors --parallel=16 -p src/ spec/",
+        "cs-fix": "phpcbf --colors --parallel=16 -p src/ spec/",
+        "test": "kahlan --reporter=verbose --coverage=4",
+        "test-coverage": "kahlan --reporter=verbose --coverage=4 --clover=clover.xml"
+    },
+    "config": {
+        "sort-packages": true,
+        "process-timeout": 900
+    }
+}

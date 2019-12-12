@@ -1,0 +1,24 @@
+# User specific & automatically generated files #
+#################################################
+/composer.lock
+/yarn.lock
+/node_modules
+/vendor
+/clover.xml
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+# Visual Studio Code
+.vscode
+
+# ignore `.gfs` git file status folder
+.gfs/
