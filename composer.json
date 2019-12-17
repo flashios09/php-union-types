@@ -22,7 +22,7 @@
         "php": "^7.1"
     },
     "require-dev": {
-        "cakephp/cakephp-codesniffer": "dev-next",
+        "cakephp/cakephp-codesniffer": "4.*",
         "filp/whoops": "^2.5",
         "kahlan/kahlan": "^4.6",
         "symfony/var-dumper": "^4.4"
