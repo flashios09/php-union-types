@@ -47,8 +47,8 @@
         ],
         "cs-check": "phpcs --colors --parallel=16 -p src/ spec/",
         "cs-fix": "phpcbf --colors --parallel=16 -p src/ spec/",
-        "test": "kahlan --reporter=verbose --coverage=4",
-        "test-coverage": "kahlan --reporter=verbose --coverage=4 --clover=clover.xml"
+        "test": "kahlan --reporter=tree --coverage=4",
+        "test-coverage": "kahlan --reporter=tree --coverage=4 --clover=clover.xml"
     },
     "config": {
         "sort-packages": true,

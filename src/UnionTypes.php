@@ -150,9 +150,10 @@ class UnionTypes
             ), 1);
         }
 
+        $reflectionFuncParameters = $reflectionFunc->getParameters();
         $funcArgs = array_map(function ($value) {
             return $value->name;
-        }, $reflectionFunc->getParameters());
+        }, $reflectionFuncParameters);
 
         if (!in_array($argName, $funcArgs)) {
             $callback = function ($value) {
@@ -170,7 +171,9 @@ class UnionTypes
         // now get the func arg value and assert it
         $argIndex = array_search($argName, $funcArgs);
         $argOffset = $argIndex + 1;
-        $argValue = $calleeStackTrace['args'][$argIndex];
+        // check if the arg value has been defined or use the default one
+        $argValue = self::_getArgValue($argIndex, $calleeStackTrace['args'], $reflectionFuncParameters);
+
         $argType = self::getType($argValue);
         if (!in_array($argType, $types)) {
             throw new TypeError(sprintf(
@@ -356,5 +359,45 @@ class UnionTypes
         }
 
         return "Unknown value type";
+    }
+
+    /**
+     * Check if the arg value has been passed or use the arg default value.
+     *
+     * ### Examples
+     * The `$calleeStackTraceArgs` doesn't have the wanted arg because it is **optional** hasn't been passed, so we
+     * have to get it from the `ReflectionFunction/ReflectionClass` using `ReflectionParameter::getDefaultValue`.
+     * ```php
+     * public function setAndRender(array $viewVars, $template = null, $layout = null);
+     * // invocation
+     * $controller->setAndRender(['posts' => $posts]);
+     * // inside `setAndRender`
+     * UnionTypes::assertFuncArg('template', ['string', 'array', 'null']);
+     *
+     * // to
+     * $argIndex = 1; // template
+     * $calleeStackTraceArgs = [
+     *     0 => 'viewVars'
+     * ];
+     * $reflectionFuncParameters = [
+     *     0 => \ReflectionParameter(['name' => 'viewVars'])
+     *     1 => \ReflectionParameter(['name' => 'template', 'getDefaultValue()' => null])
+     *     2 => \ReflectionParameter(['name' => 'layout', 'getDefaultValue()' => null])
+     * ];
+     * $argValue = self::_getArgValue($argIndex, $calleeStackTraceArgs, $reflectionFuncParameters); // null
+     * ```
+     *
+     * @param int $argIndex The argument index, e.g. `0`, `1` ...
+     * @param array $calleeStackTraceArgs The callee statck trace args array.
+     * @param \ReflectionParameter[] $reflectionFuncParameters The reflection func parameters array.
+     * @return mixed Depending on the arg value.
+     */
+    protected static function _getArgValue(int $argIndex, array $calleeStackTraceArgs, array $reflectionFuncParameters)
+    {
+        $argValue = array_key_exists($argIndex, $calleeStackTraceArgs)
+            ? $calleeStackTraceArgs[$argIndex]
+            : $reflectionFuncParameters[$argIndex]->getDefaultValue();
+
+        return $argValue;
     }
 }
