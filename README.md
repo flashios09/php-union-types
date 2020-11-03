@@ -31,7 +31,7 @@ Usage
 #### [UnionTypes::assert](#uniontypes-assert)
 
 ```php
-UnionTypes::assert(mixed $value, string[] $types): void
+UnionTypes::assert(mixed $value, string[] $types, array $options = []): void
 ```
 Throw a **TypeError** if the given value isn't in the passed union type.
 
@@ -54,10 +54,36 @@ Examples:
   ```
   ✓ should pass
 
+- Check for `instance of`, added on `1.0.2`
+  ```php
+  use \DateTime;
+
+  class Time extends DateTime
+  {
+    public static function today()
+    {
+      return new Time();
+    }
+  }
+
+  $today = Time::today();
+  ```
+  ```php
+  // `instanceOf` check is enabled by default
+  UnionTypes::assert($today, [\DateTime::class, 'string']);
+  ```
+  ✓ should pass
+  ```php
+  // disabled using the `instanceOf` option
+  UnionTypes::assert($today, [\DateTime::class, 'string', ['instanceOf' => false]]);
+  ```
+  ✖ will throw a **TypeError** *"object(Time)" must be of the union type `\DateTime|string`, `Time` given"*
+
+
 #### [UnionTypes::is](#uniontypes-is)
 
 ```php
-UnionTypes::is(mixed $value, string[] $types): bool
+UnionTypes::is(mixed $value, string[] $types, array $options = []): bool
 ```
 Check if the value type is one of the passed types.
 
@@ -87,11 +113,36 @@ Examples:
   equivalent to `is_int('1.2') || is_float('1.2') || is_string('1.2')`
 
   ✓ return `true`
+- Check for `instance of`, added on `1.0.2`
+  ```php
+  use \DateTime;
+
+  class Time extends DateTime
+  {
+    public static function today()
+    {
+      return new Time();
+    }
+  }
+
+  $today = Time::today();
+  ```
+  ```php
+  // `instanceOf` check is enabled by default
+  UnionTypes::assert($today, [\DateTime::class, 'string']);
+  ```
+  ✓ return `true`
+
+  ```php
+  // disabled using the `instanceOf` option
+  UnionTypes::assert($today, [\DateTime::class, 'string', ['instanceOf' => false]]);
+  ```
+  ✖ return `false`
 
 #### [UnionTypes::assertFuncArg](#uniontypes-asserfuncarg)
 
 ```php
-UnionTypes::assertFuncArg(string $argName, string[] $types): void
+UnionTypes::assertFuncArg(string $argName, string[] $types, array $options = []): void
 ```
 Throw a **TypesError** if the value of the argument isn't in the union type.
 
@@ -133,6 +184,46 @@ Examples:
   $closure('1.2', 1);
   ```
   ✓ should pass
+
+- Check for `instance of`, added on `1.0.2`
+  ```php
+  use \DateTime;
+
+  class Time extends DateTime
+  {
+    public static function today()
+    {
+      return new Time();
+    }
+  }
+
+  $today = Time::today();
+  ```
+  ```php
+  $closure = function ($today) {
+      // `instanceOf` check is enabled by default
+      UnionTypes::assertFuncArg($today, [\DateTime::class, 'string']);
+      // some logic here
+
+      return $today;
+  };
+  // invocation
+  $closure($today);
+  ```
+  ✓ should `pass`
+
+  ```php
+  $closure = function ($today) {
+      // disabled using the `instanceOf` option
+      UnionTypes::assertFuncArg($today, [\DateTime::class, 'string', ['instanceOf' => false]]);
+      // some logic here
+
+      return $today;
+  };
+  // invocation
+  $closure($today);
+  ```
+  ✖ will throw a **TypeError** *"object(Time)" must be of the union type `\DateTime|string`, `Time` given"*
 
 #### [Valid types:](#valid-types)
 - `'string'`

@@ -45,8 +45,8 @@
             "@cs-check",
             "@test"
         ],
-        "cs-check": "phpcs --colors --parallel=16 -p src/ spec/",
-        "cs-fix": "phpcbf --colors --parallel=16 -p src/ spec/",
+        "cs-check": "phpcs --colors --parallel=16 -p -s --exclude=CakePHP.PHP.SingleQuote --standard=CakePHP src/ spec/",
+        "cs-fix": "phpcbf --colors --parallel=16 -p -s --exclude=CakePHP.PHP.SingleQuote --standard=CakePHP src/ spec/",
         "test": "kahlan --reporter=tree --coverage=4",
         "test-coverage": "kahlan --reporter=tree --coverage=4 --clover=clover.xml"
     },
