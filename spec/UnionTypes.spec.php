@@ -5,6 +5,7 @@ use UnionTypes\Error\FatalError;
 use UnionTypes\Error\TypeError;
 use UnionTypes\Exception\ClassNotFoundException;
 use UnionTypes\Exception\InvalidUnionTypeException;
+use UnionTypes\Spec\Fixtures\Time;
 use UnionTypes\UnionTypes;
 use UnionTypes\Utilities\StackTrace;
 use function Kahlan\allow;
@@ -324,6 +325,21 @@ describe("UnionTypes", function () {
         describe("UnionTypes::is('1.2', ['int', 'float', 'string'])", function () {
             it("should return `true`", function () {
                 expect(UnionTypes::is('1.2', ['int', 'float', 'string']))->toBe(true);
+            });
+        });
+
+        describe("UnionTypes::is(\$today, [\DateTime::class, 'string'])", function () {
+            it("should return `true`", function () {
+                $today = Time::today();
+                expect(UnionTypes::is($today, [\DateTime::class]))->toBe(true);
+            });
+        });
+
+        describe("UnionTypes::is(\$today, [\DateTime::class, 'string'], ['instanceOf' => false])", function () {
+            it("should return `false`", function () {
+                $today = Time::today();
+                // disable the `instanceOf` check
+                expect(UnionTypes::is($today, [\DateTime::class], ['instanceOf' => false]))->toBe(false);
             });
         });
     });

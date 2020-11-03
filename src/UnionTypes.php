@@ -14,6 +14,19 @@ use UnionTypes\Utilities\StackTrace;
 class UnionTypes
 {
     /**
+     * The **options** array.
+     *
+     * ### Keys:
+     * - `instanceOf`: Used to enable/disable the `instance of` comparison if the value type is an **object**, `true`
+     * by default.
+     *
+     * @var array
+     */
+    public const OPTIONS = [
+        'instanceOf' => true,
+    ];
+
+    /**
      * A **pattern** used for classname type, it can be replaced by any valid classname, e.g. `Cake\ORM\Table`.
      *
      * @var string
@@ -50,6 +63,8 @@ class UnionTypes
      *
      * @param mixed $value The value to check.
      * @param array $types The types to check against.
+     * @param array $options The options array, it can be used to enable/disable the `instance of` comparison if the
+     * value type is an object, see `UnionTypes::OPTIONS`.
      * @return void
      * @throws \UnionTypes\Exception\ClassNotFoundException If the class of the passed type as a classname string
      * doesn't exist.
@@ -57,23 +72,23 @@ class UnionTypes
      * or isn't a classname string.
      * @throws \UnionTypes\Error\TypeError If the passed value isn't of the passed union type.
      */
-    public static function assert($value, array $types): void
+    public static function assert($value, array $types, array $options = []): void
     {
-        self::assertTypes(...$types);
+        $options += self::OPTIONS;
 
-        $type = self::getType($value);
-        if (!in_array($type, $types)) {
+        $isValid = self::is($value, $types, $options);
+        if (!$isValid) {
             throw new TypeError(sprintf(
                 "`%s` must be of the union type `%s`, `%s` given",
                 self::stringify($value),
                 implode('|', $types),
-                $type
+                self::getType($value)
             ));
         }
     }
 
     /**
-     * Check if the value type is one of the passed types.
+     * Check if the value type is one of the passed union types or the value is an instance of the union types.
      *
      * ### Examples
      * ```php
@@ -83,22 +98,43 @@ class UnionTypes
      * UnionTypes::is('1.2', ['int', 'float']); // false
      * // equivalent to `is_int('1.2') || is_float('1.2') || is_string('1.2')`
      * UnionTypes::is('1.2', ['int', 'float', 'string']); // true
+     * UnionTypes::is(\App\I18n\Time::today(), [\Datetime::class]); // true
+     * UnionTypes::is(\App\I18n\Time::today(), [\Datetime::class], ['instanceOf' => false]); // false
      * ```
      *
      * @param mixed $value The value to check, e.g. `1.2`.
      * @param array $types The union types to check against, e.g. `['int', 'float']`.
+     * @param array $options The options array, it can be used to enable/disable the `instance of` comparison if the
+     * value type is an object, see `UnionTypes::OPTIONS`.
      * @return bool `true` if is value type is one the passed types, `false` otherwise.
      * @throws \UnionTypes\Exception\ClassNotFoundException If the class of the passed type as a classname string
      * doesn't exist.
      * @throws \UnionTypes\Exception\InvalidUnionTypeException If the passed type isn't in the `self::UNION_TYPES` list
      * or isn't a classname string.
      */
-    public static function is($value, array $types): bool
+    public static function is($value, array $types, array $options = []): bool
     {
         self::assertTypes(...$types);
 
-        $type = self::getType($value);
-        $is = in_array($type, $types);
+        $options += self::OPTIONS;
+        $valueType = self::getType($value);
+        $isObject = is_object($value);
+        $is = false;
+        foreach ($types as $unionType) {
+            // check if the value type equal to the passed union type
+            if ($valueType === $unionType) {
+                $is = true;
+
+                break;
+            }
+
+            // check if `instanceOf` option is enabled, the value is an object and an instance of the passed union type
+            if ($options['instanceOf'] === true && $isObject && is_a($value, $unionType)) {
+                $is = true;
+
+                break;
+            }
+        }
 
         return $is;
     }
@@ -117,12 +153,14 @@ class UnionTypes
      *
      * @param string $argName The arg name, e.g. `data`.
      * @param array $types The types array, e.g. `['string', 'array']`.
+     * @param array $options The options array, it can be used to enable/disable the `instance of` comparison if the
+     * value type is an object, see `UnionTypes::OPTIONS`.
      * @return void
      * @throws \UnionTypes\Error\FatalError If it is not invoked **INSIDE** a function/method or the function itself
      * doesn't accept any argument or invalid argument name is used.
      * @throws \UnionTypes\Error\TypeError If the argument value isn't of the passed union type.
      */
-    public static function assertFuncArg(string $argName, array $types): void
+    public static function assertFuncArg(string $argName, array $types, array $options = []): void
     {
         self::assertTypes(...$types);
 
@@ -174,15 +212,16 @@ class UnionTypes
         // check if the arg value has been defined or use the default one
         $argValue = self::_getArgValue($argIndex, $calleeStackTrace['args'], $reflectionFuncParameters);
 
-        $argType = self::getType($argValue);
-        if (!in_array($argType, $types)) {
+        $options = self::OPTIONS;
+        $isValid = self::is($argValue, $types, $options);
+        if (!$isValid) {
             throw new TypeError(sprintf(
                 "Argument `%s` passed to `%s(%s)` must be of the union type `%s`, `%s` given",
                 $argOffset,
                 StackTrace::theFunc($calleeStackTrace, ['parentheses' => false]),
                 StackTrace::funcArgsEllipsis($argName, $funcArgs, ...$types),
                 implode('|', $types),
-                $argType
+                self::getType($argValue)
             ), 1);
         }
     }
