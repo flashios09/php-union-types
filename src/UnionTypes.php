@@ -212,7 +212,7 @@ class UnionTypes
         // check if the arg value has been defined or use the default one
         $argValue = self::_getArgValue($argIndex, $calleeStackTrace['args'], $reflectionFuncParameters);
 
-        $options = self::OPTIONS;
+        $options += self::OPTIONS;
         $isValid = self::is($argValue, $types, $options);
         if (!$isValid) {
             throw new TypeError(sprintf(
